@@ -8,10 +8,39 @@ router.post("/api/workouts", (req, res) => {
     })
 })
 
+router.put("/api/workouts/:id", (req, res) => {
+    Workout.findOneAndUpdate(
+            params.id,
+            { 
+            $push: {
+                exercises: [req.body],
+            },
+            }
+        )
+        .then((newWorkout) => {
+            res.json(newWorkout);
+        });
+});
+
 router.get("/api/workouts", (req, res) => {
-    Workout.find({})
-    .sort({ date: -1 })
-    .limit(7)
+    Workout.aggregate([
+        {
+            $addFields: {
+                totalDuration: {
+                    $sum: "$exercises.duration",
+                },
+                totalWeight: {
+                    $sum: "$exercises.weight",
+                },
+            },
+        },
+        {
+        $sort: ({ date: -1 })
+        },
+        {
+            $limit: 7
+        }
+    ])
     .then(workoutDB => {
         console.log(workoutDB);
         res.json(workoutDB);
