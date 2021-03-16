@@ -10,7 +10,7 @@ router.post("/api/workouts", (req, res) => {
 
 router.put("/api/workouts/:id", (req, res) => {
     Workout.findOneAndUpdate(
-            params.id,
+            { _id: req.params.id },
             { 
             $push: {
                 exercises: [req.body],
@@ -27,7 +27,7 @@ router.get("/api/workouts", (req, res) => {
         {
             $addFields: {
                 totalDuration: {
-                    $sum: "$exercises.duration",
+                    $sum: "$exercises.time",
                 },
                 totalWeight: {
                     $sum: "$exercises.weight",
