@@ -47,4 +47,29 @@ router.get("/api/workouts", (req, res) => {
     })
 });
 
+router.get("/api/workouts/:range", (req, res) => {
+    Workout.aggregate([
+        {
+            $addFields: {
+                totalDuration: {
+                    $sum: "$exercises.duration",
+                },
+                totalWeight: {
+                    $sum: "$exercises.weight",
+                },
+            },
+        },
+        {
+        $sort: ({ date: -1 })
+        },
+        {
+            $limit: 7
+        }
+    ])
+    .then(workoutDB => {
+        console.log(workoutDB);
+        res.json(workoutDB);
+    })
+});
+
 module.exports = router;
